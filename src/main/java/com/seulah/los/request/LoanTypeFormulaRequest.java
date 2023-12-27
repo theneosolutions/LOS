@@ -19,6 +19,6 @@ public class LoanTypeFormulaRequest {
 
     private double loanAmount;
 
-    private int month;
+    private String month;
 
 }
