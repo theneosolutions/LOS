@@ -1,0 +1,55 @@
+spring:
+  datasource:
+    url: ${db_url:jdbc:mysql://localhost:3306/seulahLos?createDatabaseIfNotExist=true}
+    username: ${db_username:root}
+    password: ${db_password:1124}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  sql:
+    init:
+      mode: always
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+    hibernate:
+      ddl-auto: update
+  application:
+    name: DMS-SERVICE
+server:
+  port: 8091
+logging:
+  level:
+    org:
+      springframework:
+        web: DEBUG
+cloud:
+  aws:
+    credentials:
+      access-key: ${access_key}
+      secret-key: ${secret_key}
+    region:
+      static: ${s3_region}
+    stack:
+      auto: false
+
+application:
+  bucket:
+    name: seulahbucket
+
+#springdoc:
+#  api-docs:
+#    path: /api-docs
+#  swagger-ui:
+#    path: /swagger-ui.html
+#    enabled: true
+
+#
+#eureka:
+#  client:
+#    fetch-registry: true
+#    register-with-eureka: true
+#    service-url:
+#      defaultZone: http://localhost:8761/eureka
+#  instance:
+#    ip-address: true
