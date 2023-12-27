@@ -15,7 +15,7 @@ spring:
     hibernate:
       ddl-auto: update
   application:
-    name: DMS-SERVICE
+    name: LOS-SERVICE
 server:
   port: 8091
 logging:
@@ -45,11 +45,11 @@ application:
 #    enabled: true
 
 #
-#eureka:
-#  client:
-#    fetch-registry: true
-#    register-with-eureka: true
-#    service-url:
-#      defaultZone: http://localhost:8761/eureka
-#  instance:
-#    ip-address: true
+eureka:
+  client:
+    fetch-registry: true
+    register-with-eureka: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+  instance:
+    ip-address: true
