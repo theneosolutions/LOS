@@ -32,9 +32,9 @@ public class LoanTypeCalculation {
 
     private double interestRatio;
 
-    private LocalDate firstInstallmentDate;
+    private String firstInstallmentDate;
 
-    private LocalDate lastInstallmentDate;
+    private String lastInstallmentDate;
 
     private double amountPerMonth;
 
