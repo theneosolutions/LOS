@@ -42,7 +42,6 @@ public class LoanTypeCalculationService {
         Optional<LoanType> loanType = loanTypeRepository.findById(loanTypeFormulaRequest.getLoanTypeId());
         if (loanType.isPresent()) {
             DecimalFormat decimalFormat = new DecimalFormat("##.00");
-//            LocalDate dateNow = LocalDate.now();
             LoanTexCalculation loanTexCalculation = loanTexCalculationRepository.findByLoanTypeId(loanTypeFormulaRequest.getLoanTypeId());
             if (loanTexCalculation == null) {
                 log.info("Create a loan type tex first");
