@@ -47,7 +47,7 @@ public class LoanTypeCalculationService {
                 log.info("Create a loan type tex first");
                 return new ResponseEntity<>(new MessageResponse("Please Create a tex first ", loanTypeFormulaRequest.getLoanTypeId(), false), HttpStatus.BAD_REQUEST);
             }
-            int tenureMonth = Integer.parseInt(loanTypeFormulaRequest.getMonth().substring(0, loanTypeFormulaRequest.getMonth().indexOf("m") - 1).trim().toLowerCase());
+            int tenureMonth = Integer.parseInt(loanTypeFormulaRequest.getMonth().substring(0, loanTypeFormulaRequest.getMonth().toLowerCase().indexOf("m") - 1).trim().toLowerCase());
             int month = 0;
             double interestRatio = 0;
             for (Map.Entry<String, Double> entry : loanType.get().getTenureTex().entrySet()) {
@@ -82,7 +82,7 @@ public class LoanTypeCalculationService {
     }
 
     private void saveLoanTypeFormula(LoanTypeFormulaRequest loanTypeFormulaRequest, Optional<LoanType> loanType, DecimalFormat decimalFormat, double interestRatio, double processingRatio, double vatOnFeeRatio, LoanTypeCalculation loanTypeCalculation) {
-        int tenureMonth = Integer.parseInt(loanTypeFormulaRequest.getMonth().substring(0, loanTypeFormulaRequest.getMonth().indexOf("m") - 1).trim());
+        int tenureMonth = Integer.parseInt(loanTypeFormulaRequest.getMonth().substring(0, loanTypeFormulaRequest.getMonth().toLowerCase().indexOf("m") - 1).trim());
         Instant currentTimestamp = Instant.now();
         Instant oneMonthLater = currentTimestamp.plus(Duration.ofDays(30));
         Instant lastInstallment = currentTimestamp.plus(Duration.ofDays(30L * tenureMonth));
