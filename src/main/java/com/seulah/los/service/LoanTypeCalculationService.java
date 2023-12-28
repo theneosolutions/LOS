@@ -98,6 +98,7 @@ public class LoanTypeCalculationService {
         loanTypeCalculation.setAmountPerMonth(Double.parseDouble(decimalFormat.format(amountBeforeInterest)));
         double amountAfterInterest = loanCalculationAfterInterest(loanTypeFormulaRequest.getLoanAmount(), interestRatio);
         loanTypeCalculation.setAmountAfterInterest(amountAfterInterest);
+        loanTypeCalculation.setUserId(loanTypeFormulaRequest.getUserId());
         loanTypeCalculation.setAmountPerMonthAfterInterest(Double.parseDouble(decimalFormat.format(tenureMonth)));
         loanTypeCalculation.setFirstInstallmentDate(String.valueOf(oneMonthLater.getEpochSecond()));
         loanTypeCalculation.setLastInstallmentDate(String.valueOf(lastInstallment.getEpochSecond()));

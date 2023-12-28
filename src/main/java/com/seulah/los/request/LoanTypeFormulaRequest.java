@@ -21,4 +21,6 @@ public class LoanTypeFormulaRequest {
 
     private String month;
 
+    private String userId;
+
 }
