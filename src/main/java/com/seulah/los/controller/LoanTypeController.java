@@ -28,9 +28,11 @@ public class LoanTypeController {
 
 
     @PostMapping("/create")
-    public ResponseEntity<MessageResponse> createLoanType(@RequestParam String requestReason, @RequestPart(value = "file") MultipartFile icon, @RequestPart Map<String, Double> tenureTex) {
+    public ResponseEntity<MessageResponse> createLoanType( @RequestPart("file") MultipartFile file,
+                                                           @RequestParam("requestReason") String requestReason,
+                                                           @RequestPart("tenureTex") String tenureTexJson) {
         log.info("Create Loan Type {}", requestReason);
-        return loanTypeService.createLoanType(requestReason, icon, tenureTex);
+        return null;
     }
 
     @GetMapping("/getLoanTypeById")
