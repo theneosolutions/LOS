@@ -56,9 +56,9 @@ public class LoanTypeService {
     }
 
     public ResponseEntity<MessageResponse> createLoanType(String requestReason, MultipartFile icon, Map<String, Double> tenureTex) {
-        if (!getFileExtension(icon).equalsIgnoreCase("ico")) {
-            log.error("Only ICO images are allowed.");
-            return new ResponseEntity<>(new MessageResponse("Only PNG and SVG images are allowed. ", null, false), HttpStatus.BAD_REQUEST);
+        if (!getFileExtension(icon).equalsIgnoreCase("ico")&& !getFileExtension(icon).equalsIgnoreCase("png")) {
+            log.error("Only ICO and PNG images are allowed.");
+            return new ResponseEntity<>(new MessageResponse("Only PNG and ICO images are allowed. ", null, false), HttpStatus.BAD_REQUEST);
         }
         try {
             fileUploadFeign.uploadFile(icon);
