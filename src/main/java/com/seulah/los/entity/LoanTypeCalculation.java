@@ -54,4 +54,6 @@ public class LoanTypeCalculation {
     private String userId;
 
     private double totalFee;
+
+    private String maturityDate;
 }

@@ -44,7 +44,7 @@ public class LoanTypeCalculationService {
             DecimalFormat decimalFormat = new DecimalFormat("##.00");
             LoanTexCalculation loanTexCalculation = loanTexCalculationRepository.findByLoanTypeId(loanTypeFormulaRequest.getLoanTypeId());
             if (loanTexCalculation == null) {
-                log.info("Create a loan type tex first");
+                log.error("Create a loan type tex first");
                 return new ResponseEntity<>(new MessageResponse("Please Create a tex first ", loanTypeFormulaRequest.getLoanTypeId(), false), HttpStatus.BAD_REQUEST);
             }
             String monthWithoutSpace = loanTypeFormulaRequest.getMonth().replace(" ", "");
@@ -94,6 +94,7 @@ public class LoanTypeCalculationService {
         loanTypeCalculation.setLoanAmount(loanTypeFormulaRequest.getLoanAmount());
 
         loanTypeCalculation.setMonth(tenureMonth);
+        loanTypeCalculation.setMaturityDate(String.valueOf(currentTimestamp.getEpochSecond()));
         loanTypeCalculation.setInterestRatio(interestRatio);
         loanTypeCalculation.setFormulaName(loanType.isPresent() ? loanType.get().getReason() : "");
         double amountBeforeInterest = loanCalculationOnMonth(loanTypeFormulaRequest.getLoanAmount(), tenureMonth);
