@@ -35,17 +35,17 @@ public class LoanTypeCalculation {
 
     private String lastInstallmentDate;
 
-    private double amountPerMonth;
+    private double installmentPerMonth;
 
     private int month;
 
     private double amountAfterInterest;
 
-    private double amountPerMonthAfterInterest;
+    private double installmentPerMonthAfterInterest;
 
     private double amountAfterInterestAndTex;
 
-    private double amountPerMonthAfterInterestAndTex;
+    private double installmentPerMonthAfterInterestAndTex;
 
     private double processingFee;
 

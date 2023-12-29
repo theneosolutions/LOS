@@ -47,7 +47,8 @@ public class LoanTypeCalculationService {
                 log.info("Create a loan type tex first");
                 return new ResponseEntity<>(new MessageResponse("Please Create a tex first ", loanTypeFormulaRequest.getLoanTypeId(), false), HttpStatus.BAD_REQUEST);
             }
-            int tenureMonth = Integer.parseInt(loanTypeFormulaRequest.getMonth().substring(0, loanTypeFormulaRequest.getMonth().toLowerCase().indexOf("m") - 1).trim().toLowerCase());
+            String monthWithoutSpace = loanTypeFormulaRequest.getMonth().replace(" ", "");
+            int tenureMonth = Integer.parseInt(monthWithoutSpace.substring(0, monthWithoutSpace.toLowerCase().indexOf("m")).trim().toLowerCase());
             int month = 0;
             double interestRatio = 0;
             for (Map.Entry<String, Double> entry : loanType.get().getTenureTex().entrySet()) {
@@ -82,7 +83,8 @@ public class LoanTypeCalculationService {
     }
 
     private void saveLoanTypeFormula(LoanTypeFormulaRequest loanTypeFormulaRequest, Optional<LoanType> loanType, DecimalFormat decimalFormat, double interestRatio, double processingRatio, double vatOnFeeRatio, LoanTypeCalculation loanTypeCalculation) {
-        int tenureMonth = Integer.parseInt(loanTypeFormulaRequest.getMonth().substring(0, loanTypeFormulaRequest.getMonth().toLowerCase().indexOf("m") - 1).trim());
+        String monthWithoutSpace = loanTypeFormulaRequest.getMonth().replace(" ", "");
+        int tenureMonth = Integer.parseInt(monthWithoutSpace.substring(0, monthWithoutSpace.toLowerCase().indexOf("m")).trim().toLowerCase());
         Instant currentTimestamp = Instant.now();
         Instant oneMonthLater = currentTimestamp.plus(Duration.ofDays(30));
         Instant lastInstallment = currentTimestamp.plus(Duration.ofDays(30L * tenureMonth));
@@ -95,16 +97,16 @@ public class LoanTypeCalculationService {
         loanTypeCalculation.setInterestRatio(interestRatio);
         loanTypeCalculation.setFormulaName(loanType.isPresent() ? loanType.get().getReason() : "");
         double amountBeforeInterest = loanCalculationOnMonth(loanTypeFormulaRequest.getLoanAmount(), tenureMonth);
-        loanTypeCalculation.setAmountPerMonth(Double.parseDouble(decimalFormat.format(amountBeforeInterest)));
+        loanTypeCalculation.setInstallmentPerMonth(Double.parseDouble(decimalFormat.format(amountBeforeInterest)));
         double amountAfterInterest = loanCalculationAfterInterest(loanTypeFormulaRequest.getLoanAmount(), interestRatio);
         loanTypeCalculation.setAmountAfterInterest(amountAfterInterest);
         loanTypeCalculation.setUserId(loanTypeFormulaRequest.getUserId());
-        loanTypeCalculation.setAmountPerMonthAfterInterest(Double.parseDouble(decimalFormat.format(tenureMonth)));
+        loanTypeCalculation.setInstallmentPerMonthAfterInterest(Double.parseDouble(decimalFormat.format(amountAfterInterest / tenureMonth)));
         loanTypeCalculation.setFirstInstallmentDate(String.valueOf(oneMonthLater.getEpochSecond()));
         loanTypeCalculation.setLastInstallmentDate(String.valueOf(lastInstallment.getEpochSecond()));
         double textCalculation = textCalculation(amountAfterInterest, processingRatio, vatOnFeeRatio);
         loanTypeCalculation.setAmountAfterInterestAndTex(Double.parseDouble(decimalFormat.format(textCalculation)));
-        loanTypeCalculation.setAmountPerMonthAfterInterestAndTex(Double.parseDouble(decimalFormat.format((textCalculation) / tenureMonth)));
+        loanTypeCalculation.setInstallmentPerMonthAfterInterestAndTex(Double.parseDouble(decimalFormat.format((textCalculation) / tenureMonth)));
     }
 
     private double getProcessingFee(LoanTexCalculation loanTexCalculation, int month) {
@@ -112,9 +114,7 @@ public class LoanTypeCalculationService {
         for (Map.Entry<String, Double> entry : loanTexCalculation.getProcessingFee().entrySet()) {
             if (entry.getKey().toLowerCase().contains("m") && (Integer.parseInt(entry.getKey().substring(0, entry.getKey().toLowerCase().indexOf("m")).trim()) == month)) {
                 processingRatio = entry.getValue();
-
             }
-
         }
         return processingRatio;
     }
@@ -124,9 +124,7 @@ public class LoanTypeCalculationService {
         for (Map.Entry<String, Double> entry : loanTexCalculation.getVatOnFee().entrySet()) {
             if (entry.getKey().toLowerCase().contains("m") && (Integer.parseInt(entry.getKey().substring(0, entry.getKey().toLowerCase().indexOf("m")).trim()) == month)) {
                 vatTex = entry.getValue();
-
             }
-
         }
         return vatTex;
     }

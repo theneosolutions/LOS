@@ -44,7 +44,4 @@ public class FileUploadService {
         return new byte[0];
     }
 
-    public void deleteFile(String fileName) {
-        s3Client.deleteObject(bucketName, fileName);
-    }
 }
