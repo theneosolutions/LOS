@@ -52,4 +52,6 @@ public class LoanTypeCalculation {
     private double vatOnFee;
 
     private String userId;
+
+    private double totalFee;
 }

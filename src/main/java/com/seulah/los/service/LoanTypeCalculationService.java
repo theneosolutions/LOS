@@ -106,6 +106,8 @@ public class LoanTypeCalculationService {
         loanTypeCalculation.setLastInstallmentDate(String.valueOf(lastInstallment.getEpochSecond()));
         double textCalculation = textCalculation(amountAfterInterest, processingRatio, vatOnFeeRatio);
         loanTypeCalculation.setAmountAfterInterestAndTex(Double.parseDouble(decimalFormat.format(textCalculation)));
+        double vatTex = amountAfterInterest * vatOnFeeRatio / 100;
+        loanTypeCalculation.setTotalFee(processingRatio+vatTex);
         loanTypeCalculation.setInstallmentPerMonthAfterInterestAndTex(Double.parseDouble(decimalFormat.format((textCalculation) / tenureMonth)));
     }
 
