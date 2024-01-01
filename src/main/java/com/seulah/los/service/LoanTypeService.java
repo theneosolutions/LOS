@@ -55,8 +55,8 @@ public class LoanTypeService {
         return Collections.emptyMap();
     }
 
-    public ResponseEntity<MessageResponse> createLoanType(String requestReason, MultipartFile icon, Map<String, Double> tenureTex) {
-        if (!getFileExtension(icon).equalsIgnoreCase("ico")&& !getFileExtension(icon).equalsIgnoreCase("png")) {
+    public ResponseEntity<MessageResponse> createLoanType(String requestReason, MultipartFile icon, String tenureTex, String screenName) {
+        if (!getFileExtension(icon).equalsIgnoreCase("ico") && !getFileExtension(icon).equalsIgnoreCase("png")) {
             log.error("Only ICO and PNG images are allowed.");
             return new ResponseEntity<>(new MessageResponse("Only PNG and ICO images are allowed. ", null, false), HttpStatus.BAD_REQUEST);
         }
@@ -65,7 +65,7 @@ public class LoanTypeService {
         } catch (Exception e) {
             log.error("Error", e);
         }
-        saveToDatabase(requestReason, icon, tenureTex);
+        saveToDatabase(requestReason, icon, tenureTex, screenName);
         log.info("Saved data into database successfully");
         return new ResponseEntity<>(new MessageResponse(Constants.SUCCESS, null, false), HttpStatus.OK);
     }
@@ -81,13 +81,14 @@ public class LoanTypeService {
         return FilenameUtils.getExtension(originalFilename);
     }
 
-    private void saveToDatabase(String reason, MultipartFile file, Map<String, Double> tenureTex) {
+    private void saveToDatabase(String reason, MultipartFile file, String tenureTex, String screenName) {
         LoanType loanType = loanTypeRepository.findByReason(reason);
         if (loanType == null) {
             loanType = new LoanType();
         }
         loanType.setIcon(file.getOriginalFilename());
         loanType.setReason(reason);
+        loanType.setScreenName(screenName);
         loanType.setTenureTex(tenureTex);
 
         loanTypeRepository.save(loanType);
@@ -105,11 +106,9 @@ public class LoanTypeService {
         Optional<LoanType> loanType = loanTypeRepository.findById(loanTexCalculationRequest.getLoanTypeId());
         if (loanType.isPresent()) {
             LoanTexCalculation loanTexCalculation = loanTexCalculationRepository.findByLoanTypeId(loanTexCalculationRequest.getLoanTypeId());
-            if (loanTexCalculation != null) {
-                log.info("Loan Tex Calculation already exist in the database {}", loanTexCalculationRequest.getLoanTypeId());
-                return new ResponseEntity<>(new MessageResponse("Loan tex already exist against this id ", loanTexCalculationRequest.getLoanTypeId(), false), HttpStatus.BAD_REQUEST);
+            if (loanTexCalculation == null) {
+                loanTexCalculation = new LoanTexCalculation();
             }
-            loanTexCalculation = new LoanTexCalculation();
             loanTexCalculation.setLoanTypeId(loanTexCalculationRequest.getLoanTypeId());
             loanTexCalculation.setProcessingFee(loanTexCalculationRequest.getProcessingFee());
             loanTexCalculation.setVatOnFee(loanTexCalculationRequest.getVatOnFee());

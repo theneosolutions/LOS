@@ -51,14 +51,14 @@ public class LoanTypeCalculationService {
             int tenureMonth = Integer.parseInt(monthWithoutSpace.substring(0, monthWithoutSpace.toLowerCase().indexOf("m")).trim().toLowerCase());
             int month = 0;
             double interestRatio = 0;
-            for (Map.Entry<String, Double> entry : loanType.get().getTenureTex().entrySet()) {
-                if (entry.getKey().toLowerCase().contains("m") && (Integer.parseInt(entry.getKey().substring(0, entry.getKey().toLowerCase().indexOf("m")).trim()) == tenureMonth)) {
-                    month = Integer.parseInt(entry.getKey().substring(0, entry.getKey().toLowerCase().indexOf("m")).trim());
-                    interestRatio = entry.getValue();
-
-                }
-
-            }
+//            for (Map.Entry<String, Double> entry : loanType.get().getReason()) {
+//                if (entry.getKey().toLowerCase().contains("m") && (Integer.parseInt(entry.getKey().substring(0, entry.getKey().toLowerCase().indexOf("m")).trim()) == tenureMonth)) {
+//                    month = Integer.parseInt(entry.getKey().substring(0, entry.getKey().toLowerCase().indexOf("m")).trim());
+//                    interestRatio = entry.getValue();
+//
+//                }
+//
+//            }
             if (month == 0) {
                 log.error("No a valid month {}", month);
                 return new ResponseEntity<>(new MessageResponse("Invalid Month", null, false), HttpStatus.BAD_REQUEST);
@@ -97,6 +97,7 @@ public class LoanTypeCalculationService {
         loanTypeCalculation.setMaturityDate(String.valueOf(currentTimestamp.getEpochSecond()));
         loanTypeCalculation.setInterestRatio(interestRatio);
         loanTypeCalculation.setFormulaName(loanType.isPresent() ? loanType.get().getReason() : "");
+        loanTypeCalculation.setScreenName(loanType.isPresent() ? loanType.get().getScreenName() : "");
         double amountBeforeInterest = loanCalculationOnMonth(loanTypeFormulaRequest.getLoanAmount(), tenureMonth);
         loanTypeCalculation.setInstallmentPerMonth(Double.parseDouble(decimalFormat.format(amountBeforeInterest)));
         double amountAfterInterest = loanCalculationAfterInterest(loanTypeFormulaRequest.getLoanAmount(), interestRatio);
@@ -108,7 +109,7 @@ public class LoanTypeCalculationService {
         double textCalculation = textCalculation(amountAfterInterest, processingRatio, vatOnFeeRatio);
         loanTypeCalculation.setAmountAfterInterestAndTex(Double.parseDouble(decimalFormat.format(textCalculation)));
         double vatTex = amountAfterInterest * vatOnFeeRatio / 100;
-        loanTypeCalculation.setTotalFee(processingRatio+vatTex);
+        loanTypeCalculation.setTotalFee(processingRatio + vatTex);
         loanTypeCalculation.setInstallmentPerMonthAfterInterestAndTex(Double.parseDouble(decimalFormat.format((textCalculation) / tenureMonth)));
     }
 

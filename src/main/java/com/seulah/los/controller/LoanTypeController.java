@@ -1,6 +1,5 @@
 package com.seulah.los.controller;
 
-import com.seulah.los.entity.LoanType;
 import com.seulah.los.request.LoanTexCalculationRequest;
 import com.seulah.los.request.MessageResponse;
 import com.seulah.los.service.LoanTypeService;
@@ -9,7 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -28,11 +26,11 @@ public class LoanTypeController {
 
 
     @PostMapping("/create")
-    public ResponseEntity<MessageResponse> createLoanType( @RequestPart("file") MultipartFile file,
-                                                           @RequestParam("requestReason") String requestReason,
-                                                           @RequestPart("tenureTex") String tenureTexJson) {
+    public ResponseEntity<MessageResponse> createLoanType(@RequestPart("file") MultipartFile file,
+                                                          @RequestParam("requestReason") String requestReason,
+                                                          @RequestPart("tenureTex") String tenureTexJson, @RequestParam String screenName) {
         log.info("Create Loan Type {}", requestReason);
-        return null;
+        return loanTypeService.createLoanType(requestReason, file, tenureTexJson, screenName);
     }
 
     @GetMapping("/getLoanTypeById")

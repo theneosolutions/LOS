@@ -18,17 +18,19 @@ import javax.persistence.Id;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class LoanType {
+public class SaveOnEarlyPayment {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    private String reason;
+    private String dateOfEarlyPayment;
 
-    private String icon;
+    private double savedAmount;
 
-
-    private String tenureTex;
+    private double savedPercentage;
 
     private String screenName;
+
+    private Long userId;
+    private Long loanTypeId;
 }
