@@ -7,7 +7,6 @@ import com.seulah.los.repository.LoanTexCalculationRepository;
 import com.seulah.los.repository.LoanTypeRepository;
 import com.seulah.los.request.LoanTexCalculationRequest;
 import com.seulah.los.request.MessageResponse;
-import com.seulah.los.utils.Constants;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.http.HttpStatus;
@@ -16,6 +15,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
+
+import static com.seulah.los.utils.Constants.NO_RECORD_FOUND;
+import static com.seulah.los.utils.Constants.SUCCESS;
 
 /**
  * @author Muhammad Mansoor
@@ -67,13 +69,13 @@ public class LoanTypeService {
         }
         saveToDatabase(requestReason, icon, tenureTex, screenName);
         log.info("Saved data into database successfully");
-        return new ResponseEntity<>(new MessageResponse(Constants.SUCCESS, null, false), HttpStatus.OK);
+        return new ResponseEntity<>(new MessageResponse(SUCCESS, null, false), HttpStatus.OK);
     }
 
     public ResponseEntity<MessageResponse> deleteLoanTypeId(Long id) {
         Optional<LoanType> loanType = loanTypeRepository.findById(id);
         loanType.ifPresent(loanTypeRepository::delete);
-        return new ResponseEntity<>(new MessageResponse(Constants.SUCCESS, null, false), HttpStatus.OK);
+        return new ResponseEntity<>(new MessageResponse(SUCCESS, null, false), HttpStatus.OK);
     }
 
     public String getFileExtension(MultipartFile file) {
@@ -117,5 +119,13 @@ public class LoanTypeService {
             return new ResponseEntity<>(new MessageResponse("Success ", loanTexCalculation, false), HttpStatus.OK);
         }
         return new ResponseEntity<>(new MessageResponse("No Record Found Against this id ", loanTexCalculationRequest.getLoanTypeId(), false), HttpStatus.BAD_REQUEST);
+    }
+
+    public ResponseEntity<MessageResponse> getLoanTypeTexByLoanTypeId(Long loanTypeId) {
+        LoanTexCalculation loanTexCalculation = loanTexCalculationRepository.findByLoanTypeId(loanTypeId);
+        if (loanTexCalculation != null) {
+            return new ResponseEntity<>(new MessageResponse(SUCCESS, loanTexCalculation, false), HttpStatus.OK);
+        }
+        return new ResponseEntity<>(new MessageResponse(NO_RECORD_FOUND, null, false), HttpStatus.BAD_REQUEST);
     }
 }

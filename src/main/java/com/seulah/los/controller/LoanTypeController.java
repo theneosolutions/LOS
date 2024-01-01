@@ -26,9 +26,7 @@ public class LoanTypeController {
 
 
     @PostMapping("/create")
-    public ResponseEntity<MessageResponse> createLoanType(@RequestPart("file") MultipartFile file,
-                                                          @RequestParam("requestReason") String requestReason,
-                                                          @RequestPart("tenureTex") String tenureTexJson, @RequestParam String screenName) {
+    public ResponseEntity<MessageResponse> createLoanType(@RequestPart("file") MultipartFile file, @RequestParam("requestReason") String requestReason, @RequestPart("tenureTex") String tenureTexJson, @RequestParam String screenName) {
         log.info("Create Loan Type {}", requestReason);
         return loanTypeService.createLoanType(requestReason, file, tenureTexJson, screenName);
     }
@@ -55,5 +53,11 @@ public class LoanTypeController {
     public ResponseEntity<MessageResponse> createLoanTypeTex(@RequestBody LoanTexCalculationRequest loanTexCalculationRequest) {
         log.info("Creating Loan Tex  {}", loanTexCalculationRequest);
         return loanTypeService.createLoanTypeTex(loanTexCalculationRequest);
+    }
+
+    @GetMapping("/getLoanTypeTexByLoanTypeId")
+    public ResponseEntity<MessageResponse> getLoanTypeTexByLoanTypeId(@RequestParam Long loanTypeId) {
+        log.info("Getting Loan type tex by loan type id  {}", loanTypeId);
+        return loanTypeService.getLoanTypeTexByLoanTypeId(loanTypeId);
     }
 }
