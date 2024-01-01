@@ -17,9 +17,9 @@ import org.springframework.stereotype.Service;
 import java.text.DecimalFormat;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * @author Muhammad Mansoor
@@ -49,29 +49,38 @@ public class LoanTypeCalculationService {
             }
             String monthWithoutSpace = loanTypeFormulaRequest.getMonth().replace(" ", "");
             int tenureMonth = Integer.parseInt(monthWithoutSpace.substring(0, monthWithoutSpace.toLowerCase().indexOf("m")).trim().toLowerCase());
-            int month = 0;
-            double interestRatio = 0;
-//            for (Map.Entry<String, Double> entry : loanType.get().getReason()) {
-//                if (entry.getKey().toLowerCase().contains("m") && (Integer.parseInt(entry.getKey().substring(0, entry.getKey().toLowerCase().indexOf("m")).trim()) == tenureMonth)) {
-//                    month = Integer.parseInt(entry.getKey().substring(0, entry.getKey().toLowerCase().indexOf("m")).trim());
-//                    interestRatio = entry.getValue();
-//
-//                }
-//
-//            }
-            if (month == 0) {
+            AtomicInteger month = new AtomicInteger();
+            AtomicReference<Double> interestRatio = new AtomicReference<>(0.0);
+
+            List<String> loanTypeMonths = new ArrayList<>(Arrays.asList(loanType.get().getTenureTex().split(",")));
+
+            loanTypeMonths.stream()
+                    .filter(loanTypeMonth -> {
+                        String[] parts = loanTypeMonth.split(":");
+                        String monthStr = parts[0].replaceAll("\\D", "");
+                        return Integer.parseInt(monthStr) == tenureMonth;
+                    })
+                    .findFirst()
+                    .ifPresent(loan -> {
+                        String[] parts = loan.split(":");
+                        month.set(Integer.parseInt(parts[0].replaceAll("\\D", "").trim()));
+                        interestRatio.set(Double.parseDouble(parts[1].replace("}", "").trim()));
+                    });
+
+
+            if (month.get() == 0) {
                 log.error("No a valid month {}", month);
                 return new ResponseEntity<>(new MessageResponse("Invalid Month", null, false), HttpStatus.BAD_REQUEST);
             }
-            double processingValue = getProcessingFee(loanTexCalculation, month);
-            double vatOnFeeRatio = getVatOnFee(loanTexCalculation, month);
+            double processingValue = getProcessingFee(loanTexCalculation, month.get());
+            double vatOnFeeRatio = getVatOnFee(loanTexCalculation, month.get());
 
             LoanTypeCalculation loanTypeCalculation = loanTypeCalculationRepository.findByLoanTypeId(loanTypeFormulaRequest.getLoanTypeId());
             if (loanTypeCalculation == null) {
                 loanTypeCalculation = new LoanTypeCalculation();
-                saveLoanTypeFormula(loanTypeFormulaRequest, loanType, decimalFormat, interestRatio, processingValue, vatOnFeeRatio, loanTypeCalculation);
+                saveLoanTypeFormula(loanTypeFormulaRequest, loanType, decimalFormat, interestRatio.get(), processingValue, vatOnFeeRatio, loanTypeCalculation);
             } else {
-                saveLoanTypeFormula(loanTypeFormulaRequest, loanType, decimalFormat, interestRatio, processingValue, vatOnFeeRatio, loanTypeCalculation);
+                saveLoanTypeFormula(loanTypeFormulaRequest, loanType, decimalFormat, interestRatio.get(), processingValue, vatOnFeeRatio, loanTypeCalculation);
             }
             loanTypeCalculation = loanTypeCalculationRepository.save(loanTypeCalculation);
             log.info("Successfully saved ,{}", loanTypeCalculation);
