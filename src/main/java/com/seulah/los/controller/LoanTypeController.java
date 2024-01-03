@@ -60,4 +60,10 @@ public class LoanTypeController {
         log.info("Getting Loan type tex by loan type id  {}", loanTypeId);
         return loanTypeService.getLoanTypeTexByLoanTypeId(loanTypeId);
     }
+
+    @GetMapping("/getLoanTypeMonthByLoanTypeId")
+    public List<String> getLoanTypeMonthByLoanTypeId(@RequestParam Long loanTypeId) {
+        log.info("Getting Loan type tex by loan type id  {}", loanTypeId);
+        return loanTypeService.getLoanTypeMonthByLoanTypeId(loanTypeId);
+    }
 }

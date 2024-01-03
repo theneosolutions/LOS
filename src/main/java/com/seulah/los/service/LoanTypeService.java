@@ -128,4 +128,19 @@ public class LoanTypeService {
         }
         return new ResponseEntity<>(new MessageResponse(NO_RECORD_FOUND, null, false), HttpStatus.BAD_REQUEST);
     }
+
+    public List<String> getLoanTypeMonthByLoanTypeId(Long loanTypeId) {
+        Optional<LoanType> loanType = loanTypeRepository.findById(loanTypeId);
+        if (loanType.isPresent()) {
+            List<String> loanTypeMonths = new ArrayList<>(Arrays.asList(loanType.get().getTenureTex().split(",")));
+            List<String> monthStr = new ArrayList<>();
+
+            loanTypeMonths.forEach(m -> {
+                String[] parts = m.split(":");
+                monthStr.add(parts[0].replaceAll("\\D", "") + " Month");
+            });
+            return monthStr;
+        }
+        return Collections.emptyList();
+    }
 }
