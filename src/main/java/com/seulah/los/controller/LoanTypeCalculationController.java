@@ -21,9 +21,9 @@ public class LoanTypeCalculationController {
     }
 
     @PostMapping("createLoanTypeCalculation")
-    public ResponseEntity<MessageResponse> createLoanTypeCalculation(@RequestBody LoanTypeFormulaRequest loanTypeFormulaRequest) {
+    public ResponseEntity<MessageResponse> createLoanTypeCalculation(@RequestBody LoanTypeFormulaRequest loanTypeFormulaRequest ,@RequestParam(required = false) boolean wantToSave) {
         log.info("Creating Loan Type Formula : {}", loanTypeFormulaRequest);
-        return loanTypeCalculationService.createLoanTypeFormula(loanTypeFormulaRequest);
+        return loanTypeCalculationService.createLoanTypeFormula(loanTypeFormulaRequest,wantToSave);
     }
 
     @GetMapping("getAllLoanTypeFormula")

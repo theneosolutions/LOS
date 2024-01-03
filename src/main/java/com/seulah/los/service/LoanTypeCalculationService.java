@@ -38,7 +38,7 @@ public class LoanTypeCalculationService {
         this.loanTexCalculationRepository = loanTexCalculationRepository;
     }
 
-    public ResponseEntity<MessageResponse> createLoanTypeFormula(LoanTypeFormulaRequest loanTypeFormulaRequest) {
+    public ResponseEntity<MessageResponse> createLoanTypeFormula(LoanTypeFormulaRequest loanTypeFormulaRequest, boolean wantToSave) {
         Optional<LoanType> loanType = loanTypeRepository.findById(loanTypeFormulaRequest.getLoanTypeId());
         if (loanType.isPresent()) {
             DecimalFormat decimalFormat = new DecimalFormat("##.00");
@@ -47,8 +47,7 @@ public class LoanTypeCalculationService {
                 log.error("Create a loan type tex first");
                 return new ResponseEntity<>(new MessageResponse("Please Create a tex first ", loanTypeFormulaRequest.getLoanTypeId(), false), HttpStatus.BAD_REQUEST);
             }
-            String monthWithoutSpace = loanTypeFormulaRequest.getMonth().replace(" ", "");
-            int tenureMonth = Integer.parseInt(monthWithoutSpace.substring(0, monthWithoutSpace.toLowerCase().indexOf("m")).trim().toLowerCase());
+            int tenureMonth = getMonth(loanTypeFormulaRequest);
             AtomicInteger month = new AtomicInteger();
             AtomicReference<Double> interestRatio = new AtomicReference<>(0.0);
 
@@ -82,7 +81,9 @@ public class LoanTypeCalculationService {
             } else {
                 saveLoanTypeFormula(loanTypeFormulaRequest, loanType, decimalFormat, interestRatio.get(), processingValue, vatOnFeeRatio, loanTypeCalculation);
             }
-            loanTypeCalculation = loanTypeCalculationRepository.save(loanTypeCalculation);
+            if (wantToSave) {
+                loanTypeCalculation = loanTypeCalculationRepository.save(loanTypeCalculation);
+            }
             log.info("Successfully saved ,{}", loanTypeCalculation);
             return new ResponseEntity<>(new MessageResponse(Constants.SUCCESS, loanTypeCalculation, false), HttpStatus.CREATED);
 
@@ -92,8 +93,8 @@ public class LoanTypeCalculationService {
     }
 
     private void saveLoanTypeFormula(LoanTypeFormulaRequest loanTypeFormulaRequest, Optional<LoanType> loanType, DecimalFormat decimalFormat, double interestRatio, double processingRatio, double vatOnFeeRatio, LoanTypeCalculation loanTypeCalculation) {
-        String monthWithoutSpace = loanTypeFormulaRequest.getMonth().replace(" ", "");
-        int tenureMonth = Integer.parseInt(monthWithoutSpace.substring(0, monthWithoutSpace.toLowerCase().indexOf("m")).trim().toLowerCase());
+
+        int tenureMonth = getMonth(loanTypeFormulaRequest);
         Instant currentTimestamp = Instant.now();
         Instant oneMonthLater = currentTimestamp.plus(Duration.ofDays(30));
         Instant lastInstallment = currentTimestamp.plus(Duration.ofDays(30L * tenureMonth));
@@ -120,6 +121,17 @@ public class LoanTypeCalculationService {
         double vatTex = amountAfterInterest * vatOnFeeRatio / 100;
         loanTypeCalculation.setTotalFee(processingRatio + vatTex);
         loanTypeCalculation.setInstallmentPerMonthAfterInterestAndTex(Double.parseDouble(decimalFormat.format((textCalculation) / tenureMonth)));
+    }
+
+    private int getMonth(LoanTypeFormulaRequest loanTypeFormulaRequest) {
+        String monthWithoutSpace = loanTypeFormulaRequest.getMonth().replace(" ", "");
+        int tenureMonth;
+        if (monthWithoutSpace.toLowerCase().contains("m")) {
+            tenureMonth = Integer.parseInt(monthWithoutSpace.substring(0, monthWithoutSpace.toLowerCase().indexOf("m")).trim().toLowerCase());
+        } else {
+            tenureMonth = Integer.parseInt(monthWithoutSpace);
+        }
+        return tenureMonth;
     }
 
     private double getProcessingFee(LoanTexCalculation loanTexCalculation, int month) {
